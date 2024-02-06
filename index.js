@@ -13,11 +13,11 @@ function calcularSituationAndNAF(matricula, nome, p1, p2, p3, faltas) {
     } else if (media < 50) {
         console.log(`Aluno com matrícula ${matricula} e nome ${nome} reprovado por nota.`);
         return 'Reprovado por Nota';
-    } else if (media < 7) {
+    } else if (media < 70) {
         // Verificar situação "Exame Final"
         const naf = calcularNAF(media);
         console.log(`Aluno com matrícula ${matricula} e nome ${nome} em Exame Final. NAF: ${naf}`);
-        return { situation: 'Exame Final', naf: naf };
+        return 'Exame Final';
     } else {
         console.log(`Aluno com matrícula ${matricula} e nome ${nome} aprovado.`);
         return 'Aprovado';
@@ -25,8 +25,13 @@ function calcularSituationAndNAF(matricula, nome, p1, p2, p3, faltas) {
 }
 
 function calcularNAF(media) {
-    const naf = Math.ceil((5 - media) * 2); 
-    return naf >= 0 ? naf : 0; 
+    console.log(media)
+    const naf = Math.ceil((70 - media) * 2); 
+   
+    const teste = naf >= 0 ? naf : 0; 
+    console.log(`Teste ${teste}`)
+    console.log(`NA ${naf}`)
+    return teste
 }
 
 function main() {
