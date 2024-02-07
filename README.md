@@ -3,7 +3,7 @@
 Controle Acadêmico - Node.js Excel Calculator
 Este projeto Node.js utiliza a biblioteca xlsx para realizar o controle acadêmico, calculando a situação de alunos com base em médias e faltas. Ele também determina a nota necessária para aprovação final em caso de exame.
 
-Como Usar
+## Como Usar
 Instalação das Dependências:
 
 Execute o seguinte comando para instalar as dependências necessárias:
