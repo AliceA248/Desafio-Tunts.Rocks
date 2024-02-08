@@ -1,68 +1,78 @@
 const XLSX = require('xlsx');
 const path = require('path');
 
-const INPUT_FILE_PATH = path.join(__dirname, 'planilha','planilha.xlsx');
+// File paths for input and output 
+const INPUT_FILE_PATH = path.join(__dirname, 'planilha', 'planilha.xlsx');
+const OUTPUT_FILE_PATH = path.join(__dirname, 'planilha', 'nova_planilha.xlsx');
 
-function calculateSituationAndNAF(studentId, name, grade1, grade2, grade3, absences) {
-    const average = (grade1 + grade2 + grade3) / 3;
-    const totalClasses = 60;
+const STARTING_ROW = 3;
 
-    if (absences > 0.25 * totalClasses) {
-        console.log(`Student with ID ${studentId} and name ${name} failed due to excessive absences.`);
-        return 'Failed due to Absences';
-    } else if (average < 50) {
-        console.log(`Student with ID ${studentId} and name ${name} failed due to low grades.`);
-        return 'Failed due to Grades';
-    } else if (average < 70) {
-        // Check status "Final Exam"
-        const naf = calculateNAF(average);
-        console.log(`Student with ID ${studentId} and name ${name} in Final Exam. NAF: ${naf}`);
-        return 'Final Exam';
+function calculateSituationAndNAF(matricula, nome, p1, p2, p3, faltas) {
+    const media = (p1 + p2 + p3) / 3;
+    const totalAulas = 60;
+
+    // Check for excessive absences
+    if (faltas > 0.25 * totalAulas) {
+        return 'Reprovado por Falta';
+    } else if (media < 50) {
+        return 'Reprovado por Nota';
+    } else if (media < 70) {
+        // Proceed to "Final Exam" status and calculate NAF
+        const naf = calculateNAF(media);
+        return 'Exame Final';
     } else {
-        console.log(`Student with ID ${studentId} and name ${name} passed.`);
-        return 'Passed';
+        return 'Aprovado';
     }
 }
 
-function calculateNAF(average) {
-    console.log(average);
-    const naf = Math.ceil((50 - average) * 2);
-
-    const finalNAF = naf >= 0 ? naf : 0;
-    console.log(`Test ${finalNAF}`);
-    console.log(`NAF ${naf}`);
-    return finalNAF;
+function calculateNAF(media) {
+    // Calculate NAF based on the formula
+    const naf = Math.ceil((70 - media) * 2);
+    return naf >= 0 ? naf : 0;
 }
 
-function main() {
-    const workbook = XLSX.readFile(INPUT_FILE_PATH);
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+function processWorksheet(worksheet) {
+    // Decode the range of the worksheet
     const range = XLSX.utils.decode_range(worksheet['!ref']);
 
-    for (let row = range.s.r + 3; row <= range.e.r; row++) {
-        const studentId = worksheet[XLSX.utils.encode_cell({ r: row, c: 0 })].v;
-        const name = worksheet[XLSX.utils.encode_cell({ r: row, c: 1 })].v;
-        const absences = worksheet[XLSX.utils.encode_cell({ r: row, c: 2 })].v;
-        const grade1 = worksheet[XLSX.utils.encode_cell({ r: row, c: 3 })].v;
-        const grade2 = worksheet[XLSX.utils.encode_cell({ r: row, c: 4 })].v;
-        const grade3 = worksheet[XLSX.utils.encode_cell({ r: row, c: 5 })].v;
+    for (let row = range.s.r + STARTING_ROW; row <= range.e.r; row++) {
+        const matricula = worksheet[XLSX.utils.encode_cell({ r: row, c: 0 })].v;
+        const nome = worksheet[XLSX.utils.encode_cell({ r: row, c: 1 })].v;
+        const faltas = worksheet[XLSX.utils.encode_cell({ r: row, c: 2 })].v;
+        const p1 = worksheet[XLSX.utils.encode_cell({ r: row, c: 3 })].v;
+        const p2 = worksheet[XLSX.utils.encode_cell({ r: row, c: 4 })].v;
+        const p3 = worksheet[XLSX.utils.encode_cell({ r: row, c: 5 })].v;
 
-        const result = calculateSituationAndNAF(studentId, name, grade1, grade2, grade3, absences);
+        const result = calculateSituationAndNAF(matricula, nome, p1, p2, p3, faltas);
 
         worksheet[XLSX.utils.encode_cell({ r: row, c: 6 })] = { t: 's', v: result };
 
-        if (result === 'Final Exam') {
-            const naf = calculateNAF((grade1 + grade2 + grade3) / 3);
+        // If the result is "Final Exam," calculate and update the NAF value
+        if (result === 'Exame Final') {
+            const naf = calculateNAF((p1 + p2 + p3) / 3);
             worksheet[XLSX.utils.encode_cell({ r: row, c: 7 })] = { t: 'n', v: naf };
         } else {
+            // If not, set the NAF value to 0
             worksheet[XLSX.utils.encode_cell({ r: row, c: 7 })] = { t: 'n', v: 0 };
         }
     }
+}
 
-    const OUTPUT_FILE_PATH = path.join(__dirname, 'planilha', 'planilha.xlsx');
-    XLSX.writeFile(workbook, OUTPUT_FILE_PATH);
-    console.log('Results written to the new Excel file.');
+function main() {
+    try {
+        const workbook = XLSX.readFile(INPUT_FILE_PATH);
+
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        processWorksheet(worksheet);
+
+        XLSX.writeFile(workbook, OUTPUT_FILE_PATH);
+
+        console.log('Results written to the new Excel file.');
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+    }
 }
 
 main();
