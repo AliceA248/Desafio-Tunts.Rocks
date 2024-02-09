@@ -18,11 +18,11 @@ Execute o seguinte comando para calcular as situações e notas para aprovação
 
 ### `node index.js`
 
-Certifique-se de que o arquivo Excel original (planilha.xlsx) está presente na pasta planilha.
+Certifique-se de que o arquivo Excel está presente na pasta planilha.
 
 ## Resultados:
 
-Os resultados serão salvos no arquivo nova_planilha.xlsx na pasta planilha.
+Os resultados serão salvos no arquivo .xlsx na pasta planilha, no caso nomeada Engenharia de Software – Desafio Alice Pereira.xlsx,
 
 ## Estrutura do Projeto
 
