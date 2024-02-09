@@ -2,8 +2,7 @@ const XLSX = require('xlsx');
 const path = require('path');
 
 // File paths for input and output 
-const INPUT_FILE_PATH = path.join(__dirname, 'planilha', 'planilha.xlsx');
-const OUTPUT_FILE_PATH = path.join(__dirname, 'planilha', 'nova_planilha.xlsx');
+const INPUT_FILE_PATH = path.join(__dirname, 'planilha', 'Engenharia de Software – Desafio Alice Pereira.xlsx');
 
 const STARTING_ROW = 3;
 
@@ -67,11 +66,11 @@ function main() {
 
         processWorksheet(worksheet);
 
-        XLSX.writeFile(workbook, OUTPUT_FILE_PATH);
+        XLSX.writeFile(workbook, INPUT_FILE_PATH);
 
-        console.log('Results written to the new Excel file.');
+        console.log('Changes saved');
     } catch (error) {
-        console.error('An error occurred:', error.message);
+        console.error('Error:', error.message);
     }
 }
 
